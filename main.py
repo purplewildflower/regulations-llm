@@ -4,7 +4,8 @@ import threading
 import time
 import subprocess
 import webbrowser
-from src.backend.run import backend
+import argparse
+from src.backend.run import run as run_backend
 
 def run_angular_frontend():
     """Run the Angular frontend development server and open it in the browser."""
@@ -31,24 +32,45 @@ def run_angular_frontend():
 
 def main():
     """Run both backend and frontend."""
-    # Start the backend in a separate thread
-    backend_thread = threading.Thread(target=backend)
-    backend_thread.daemon = True
-    backend_thread.start()
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Run the regulations search application')
+    parser.add_argument('--update-db', action='store_true', help='Update the database with the latest data')
+    parser.add_argument('--backend-only', action='store_true', help='Run only the backend')
+    parser.add_argument('--frontend-only', action='store_true', help='Run only the frontend')
+    args = parser.parse_args()
     
-    # Start the frontend
-    frontend_process = run_angular_frontend()
+    frontend_process = None
     
     try:
-        # Keep the main thread alive while the frontend is running
-        while frontend_process.poll() is None:
-            time.sleep(1)
+        # Start the backend if requested
+        if not args.frontend_only:
+            if args.backend_only:
+                # If backend only, run directly (blocking)
+                run_backend(args.update_db)
+            else:
+                # Otherwise run in a daemon thread
+                backend_thread = threading.Thread(target=run_backend, args=(args.update_db,))
+                backend_thread.daemon = True
+                backend_thread.start()
+        
+        # Start the frontend if requested
+        if not args.backend_only:
+            # Start the frontend
+            frontend_process = run_angular_frontend()
+            
+            # Keep the main thread alive while the frontend is running
+            while frontend_process.poll() is None:
+                time.sleep(1)
+            
     except KeyboardInterrupt:
-        print("Shutting down...")
+        print("\nShutting down...")
     finally:
-        # Try to terminate the frontend process gracefully
-        if frontend_process.poll() is None:
+        # Clean up processes
+        if frontend_process and frontend_process.poll() is None:
+            print("Terminating frontend process...")
             frontend_process.terminate()
+            
+        # The backend thread is a daemon thread, so it will exit when the main thread exits
 
 if __name__ == "__main__":
     main()
