@@ -1,17 +1,17 @@
-from typing import List
 import json
+from typing import List
 
 from src.backend.models.docket import Docket
 
+
 class DocketExtractionService:
+    """Service for extracting dockets from a JSON file.
     """
-    Service for extracting dockets from a JSON file.
-    """
+
     def load_dockets_from_json(self, path: str) -> List[Docket]:
+        """Loads dockets from a JSON file and returns a list of Docket instances.
         """
-        Loads dockets from a JSON file and returns a list of Docket instances.
-        """
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             print(f"Loading dockets from {path}")
             data = json.load(f)
         return [Docket(**item) for item in data]
