@@ -6,6 +6,8 @@ from typing import List, Dict, Any
 from src.backend.database.db_manager import get_all_dockets, search_dockets
 from src.backend.models.domain.docket import Docket
 
+# TODO: move routes to a different folder/file
+
 # Create FastAPI instance
 app = FastAPI(
     title="Regulations API",
@@ -43,6 +45,8 @@ def get_regulations():
     dockets = get_all_dockets()
     return [docket_to_dict(docket) for docket in dockets]
 
+
+# TODO: change /search/ to /keyword-search/
 @app.get("/api/regulations/search/{search_term}", response_model=List[Dict[str, Any]])
 def search_regulations(search_term: str):
     """Search for regulations by keyword."""

@@ -87,4 +87,5 @@ def search_dockets(search_term: str) -> List[Docket]:
     """
     with get_db_session() as db:
         docket_service = DocketService(db)
+        # For now, we just want to return the dockets that have the keyword matching the search term
         return docket_service.search_dockets_by_keyword(search_term)

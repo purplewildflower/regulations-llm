@@ -53,7 +53,7 @@ def search_regulations(search_term: str) -> List[Docket]:
     """
     return search_dockets(search_term)
 
-def backend(update_data: bool = True) -> None:
+def run(update_data: bool = True) -> None:
     """Run the backend, processing data and starting any necessary services.
     
     Args:
@@ -71,7 +71,27 @@ def backend(update_data: bool = True) -> None:
     
     # Start the FastAPI server using Uvicorn
     import uvicorn
+    import threading
+    import signal
+    import sys
     from src.backend.api import app
     
     print("Starting FastAPI server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    
+    # Use a Server instance instead of the simple run method
+    # This allows for graceful shutdown
+    server = uvicorn.Server(
+        config=uvicorn.Config(
+            app=app,
+            host="0.0.0.0",
+            port=8000,
+            log_level="info"
+        )
+    )
+    
+    # Run server in the current thread
+    try:
+        server.run()
+    except KeyboardInterrupt:
+        print("Shutting down server...")
+        sys.exit(0)

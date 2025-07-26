@@ -75,8 +75,19 @@ python main.py --frontend-only
 
 ### 4. View the database contents
 
-To view the keywords:
-`python view_database.py --web`
+To view the database contents in a web browser:
+```
+python view_database.py --web
+```
+
+### 5. View and test the API
+
+To view the API documentation and test the endpoints interactively:
+```
+python view_api.py
+```
+
+This will start the FastAPI server and open the Swagger UI in your web browser, where you can explore and test all available API endpoints.
 
 ## Technical Details
 

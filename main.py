@@ -39,35 +39,38 @@ def main():
     parser.add_argument('--frontend-only', action='store_true', help='Run only the frontend')
     args = parser.parse_args()
     
-    # Start the backend if requested
-    if not args.frontend_only:
-        # Start the backend in a separate thread
-        backend_thread = threading.Thread(target=run_backend, args=(args.update_db,))
-        backend_thread.daemon = True
-        backend_thread.start()
+    frontend_process = None
     
-    # Start the frontend if requested
-    if not args.backend_only:
-        # Start the frontend
-        frontend_process = run_angular_frontend()
+    try:
+        # Start the backend if requested
+        if not args.frontend_only:
+            if args.backend_only:
+                # If backend only, run directly (blocking)
+                run_backend(args.update_db)
+            else:
+                # Otherwise run in a daemon thread
+                backend_thread = threading.Thread(target=run_backend, args=(args.update_db,))
+                backend_thread.daemon = True
+                backend_thread.start()
         
-        try:
+        # Start the frontend if requested
+        if not args.backend_only:
+            # Start the frontend
+            frontend_process = run_angular_frontend()
+            
             # Keep the main thread alive while the frontend is running
             while frontend_process.poll() is None:
                 time.sleep(1)
-        except KeyboardInterrupt:
-            print("Shutting down...")
-        finally:
-            # Try to terminate the frontend process gracefully
-            if frontend_process.poll() is None:
-                frontend_process.terminate()
-    else:
-        # If only running backend, keep main thread alive until interrupted
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("Shutting down...")
+            
+    except KeyboardInterrupt:
+        print("\nShutting down...")
+    finally:
+        # Clean up processes
+        if frontend_process and frontend_process.poll() is None:
+            print("Terminating frontend process...")
+            frontend_process.terminate()
+            
+        # The backend thread is a daemon thread, so it will exit when the main thread exits
 
 if __name__ == "__main__":
     main()
