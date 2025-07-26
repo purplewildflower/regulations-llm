@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from src.backend.models.docket import Docket
+from src.backend.models.domain.docket import Docket
 
 
 class DocketExtractionService:
