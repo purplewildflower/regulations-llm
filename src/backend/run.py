@@ -3,7 +3,7 @@
 from src.backend.ingestion.docket_extraction_service import DocketExtractionService
 from src.backend.keywords.local_nlp_keyword_service import LocalNLPKeywordService
 
-def backend():
+def run():
     """This gets the dockets from the data and extracts the keywords."""
     print("Starting docket extraction and keyword extraction process...")
     docket_extraction_service = DocketExtractionService()
