@@ -210,8 +210,8 @@ __marimo__/
 
 
 # RAG folders
-.src/semantic_search/cache/
-.src/semantic_search/vectorstore/
+src/semantic_search/cache/
+src/backend/semantic_search/vector_store/
 
 # Temp files 
 *.DS_Store
